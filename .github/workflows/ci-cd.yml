@@ -6,7 +6,8 @@ on:
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
+    # Utiliser le runner self-hosted qui est sur le même réseau que ton cluster
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repository
