@@ -40,11 +40,15 @@ jobs:
         with:
           version: 'latest'
 
+      - name: Configure kubeconfig
+        run: |
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
+
       - name: Deploy to Kubernetes
         run: |
-          kubectl set image deployment/${{ env.DEPLOYMENT_NAME }} \
-            ${{ env.DEPLOYMENT_NAME }}=$IMAGE_NAME:${{ github.run_number }} \
-            -n ${{ env.K8S_NAMESPACE }}
+          kubectl set image deployment/$DEPLOYMENT_NAME \
+            $DEPLOYMENT_NAME=$IMAGE_NAME:${{ github.run_number }} \
+            -n $K8S_NAMESPACE
         env:
           IMAGE_NAME: belcodiallo/contacts-app
           DEPLOYMENT_NAME: contacts-app
