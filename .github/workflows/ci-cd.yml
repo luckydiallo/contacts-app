@@ -18,6 +18,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Check Maven version
+        run: mvn -v
+
       - name: Build JAR with Maven
         run: mvn -B package --file pom.xml
 
