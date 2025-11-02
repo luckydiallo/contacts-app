@@ -28,10 +28,10 @@ jobs:
           password: Docker @192.168.0.0
 
       - name: Build Docker image
-        run: docker build -t belcodiallo/contacts-app{{ github.run_number }} .
+        run: docker build -t belcodiallo/contacts-app:${{ github.run_number }} .
 
       - name: Push Docker image
-        run: docker push belcodiallo/contacts-app{{ github.run_number }}
+        run: docker push belcodiallo/contacts-app:${{ github.run_number }}
         env:
           IMAGE_NAME: belcodiallo/contacts-app
 
