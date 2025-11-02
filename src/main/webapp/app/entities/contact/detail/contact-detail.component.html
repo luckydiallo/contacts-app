@@ -1,0 +1,62 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (contact(); as contactRef) {
+      <div>
+        <h2 data-cy="contactDetailsHeading"><span>Contact</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ contactRef.id }}</span>
+          </dd>
+          <dt><span>Nom</span></dt>
+          <dd>
+            <span>{{ contactRef.nom }}</span>
+          </dd>
+          <dt><span>Prenom</span></dt>
+          <dd>
+            <span>{{ contactRef.prenom }}</span>
+          </dd>
+          <dt><span>Email</span></dt>
+          <dd>
+            <span>{{ contactRef.email }}</span>
+          </dd>
+          <dt><span>Street</span></dt>
+          <dd>
+            <span>{{ contactRef.street }}</span>
+          </dd>
+          <dt><span>Telephone</span></dt>
+          <dd>
+            <span>{{ contactRef.telephone }}</span>
+          </dd>
+          <dt><span>Groupe Id</span></dt>
+          <dd>
+            @if (contact()!.groupe_id) {
+              <div>
+                <a [routerLink]="['/groupe', contact()!.groupe_id?.id, 'view']">{{ contactRef.groupe_id?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>User Id</span></dt>
+          <dd>
+            <span>{{ contactRef.user_id?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/contact', contactRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

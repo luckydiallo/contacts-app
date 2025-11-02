@@ -1,0 +1,64 @@
+<div class="d-flex justify-content-center mt-4">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="p-4 shadow rounded-3 bg-white">
+      <h2 id="jhi-groupe-heading" data-cy="GroupeCreateUpdateHeading" class="mb-4 text-center">
+        {{ editForm.get('id')?.value ? 'Modifier un Groupe' : 'Créer un Groupe' }}
+      </h2>
+
+      <jhi-alert-error />
+
+      <!-- Champ ID (lecture seule en mode édition) -->
+      @if (editForm.controls.id.value !== null) {
+        <div class="mb-3">
+          <label class="form-label fw-bold" for="field_id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" readonly />
+        </div>
+      }
+
+      <!-- Champ Nom -->
+      @let nomRef = editForm.get('nom')!;
+      <div class="mb-3">
+        <label class="form-label fw-bold" for="field_nom">Nom du groupe <span class="text-danger">*</span></label>
+        <input
+          type="text"
+          class="form-control"
+          name="nom"
+          id="field_nom"
+          data-cy="nom"
+          formControlName="nom"
+          placeholder="Entrez le nom du groupe"
+        />
+        @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
+          <div class="mt-1">
+            @if (nomRef.errors?.required) {
+              <small class="text-danger">Ce champ est obligatoire.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Boutons d’action -->
+      <div class="d-flex justify-content-between mt-4">
+        <button
+          type="button"
+          id="cancel-save"
+          data-cy="entityCreateCancelButton"
+          class="btn btn-outline-secondary px-4"
+          (click)="previousState()"
+        >
+          <fa-icon icon="ban"></fa-icon>&nbsp;Annuler
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary px-4"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;Sauvegarder
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

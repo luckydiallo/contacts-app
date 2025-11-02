@@ -1,0 +1,33 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "authenticationType": "jwt",
+    "baseName": "contactsApp",
+    "buildTool": "maven",
+    "cacheProvider": "no",
+    "clientFramework": "angular",
+    "clientTestFrameworks": [],
+    "clientTheme": "none",
+    "creationTimestamp": 1760994948358,
+    "databaseType": "sql",
+    "devDatabaseType": "postgresql",
+    "enableHibernateCache": null,
+    "enableTranslation": false,
+    "entities": ["Groupe", "Contact"],
+    "feignClient": null,
+    "jhipsterVersion": "8.11.0",
+    "jwtSecretKey": "YWRmYTc0ZTI5NmZjOTFiYmI3ZjY4MTM0NGFlYWYwZGRmMjNkY2IxZmY0YjU0YTFlMDNhNDllZDczOWZkNTE5YWUzMmQyYzEyMzU5ZWFkNDkwMzY0OGY3NmJkODJlODc3MDc5NGNmYzJmZTk4NDI3NmRhMTBiYjkxNDhiOTI2ZWI=",
+    "lastLiquibaseTimestamp": 1761002179000,
+    "microfrontend": null,
+    "microfrontends": [],
+    "nativeLanguage": "fr",
+    "packageName": "contact.app.bf",
+    "prodDatabaseType": "postgresql",
+    "reactive": false,
+    "serverPort": null,
+    "serviceDiscoveryType": null,
+    "syncUserWithIdp": null,
+    "testFrameworks": [],
+    "withAdminUi": true
+  }
+}

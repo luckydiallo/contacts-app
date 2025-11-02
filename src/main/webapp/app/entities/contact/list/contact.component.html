@@ -1,0 +1,59 @@
+<div>
+  <h2 id="page-heading" data-cy="ContactHeading">
+    <span>Contacts</span>
+    <div class="d-flex justify-content-end mb-3">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span>Actualiser la liste</span>
+      </button>
+
+      <button id="jh-create-entity" data-cy="entityCreateButton" class="btn btn-primary jh-create-entity" [routerLink]="['/contact/new']">
+        <fa-icon icon="plus"></fa-icon>
+        <span>Créer un nouveau Contact</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+  <jhi-alert></jhi-alert>
+
+  <div *ngIf="contacts().length === 0" class="alert alert-warning" id="no-result">Aucun Contact trouvé</div>
+
+  <div class="row g-4" *ngIf="contacts().length > 0">
+    <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let contact of contacts(); trackBy: trackId">
+      <div class="card contact-card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ contact.nom }} {{ contact.prenom }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">{{ contact.email }}</h6>
+          <p class="card-text">
+            <strong>Téléphone:</strong> {{ contact.telephone }}<br />
+            <strong>Adresse:</strong> {{ contact.street || 'N/A' }}<br />
+            <strong>Groupe:</strong> {{ contact.groupe_id?.nom || 'N/A' }}
+          </p>
+          <div class="d-flex justify-content-between mt-3">
+            <a [routerLink]="['/contact', contact.id, 'view']" class="btn btn-outline-info btn-sm"> <fa-icon icon="eye"></fa-icon> Voir </a>
+            <a [routerLink]="['/contact', contact.id, 'edit']" class="btn btn-outline-primary btn-sm">
+              <fa-icon icon="pencil-alt"></fa-icon> Editer
+            </a>
+            <button type="button" (click)="delete(contact)" class="btn btn-outline-danger btn-sm">
+              <fa-icon icon="times"></fa-icon> Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="contacts().length > 0" class="mt-4 d-flex justify-content-center">
+    <ngb-pagination
+      [collectionSize]="totalItems"
+      [page]="page"
+      [pageSize]="itemsPerPage"
+      [maxSize]="5"
+      [rotate]="true"
+      [boundaryLinks]="true"
+      (pageChange)="navigateToPage($event)"
+    ></ngb-pagination>
+  </div>
+</div>

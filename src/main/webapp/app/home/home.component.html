@@ -1,0 +1,37 @@
+<div class="home-container text-center py-5">
+  <div class="container">
+    <!-- En-tête principale -->
+    <div class="mb-4">
+      <h1 class="display-4 fw-bold text-primary animate__animated animate__fadeInDown">
+        Bienvenue sur notre <span class="text-accent">Application de Gestion de Contacts</span>
+      </h1>
+      <p class="lead text-muted">Gérez facilement vos contacts et groupes, le tout en un seul endroit.</p>
+    </div>
+
+    <!-- Message utilisateur -->
+    <div>
+      @if (account() !== null) {
+        @if (account(); as accountRef) {
+          <div class="alert alert-success w-75 mx-auto shadow-sm fade-in">
+            <fa-icon icon="user-circle" class="me-2"></fa-icon>
+            <span id="home-logged-message"
+              >Vous êtes connecté en tant que <strong>{{ accountRef.login }}</strong
+              >.</span
+            >
+          </div>
+        }
+      } @else {
+        <div class="alert alert-info w-75 mx-auto shadow-sm fade-in">
+          <fa-icon icon="info-circle" class="me-2"></fa-icon>
+          <span>Connectez-vous pour accéder à vos contacts et groupes.</span>
+          <br />
+          <a class="btn btn-primary mt-3" (click)="login()">Se connecter</a>
+          <p class="mt-3 mb-0">
+            Vous n'avez pas encore de compte ?
+            <a routerLink="/account/register" class="text-decoration-none fw-bold">Créer un compte</a>
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

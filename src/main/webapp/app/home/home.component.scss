@@ -1,0 +1,33 @@
+.home-container {
+  background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .text-accent {
+    color: #007bff;
+  }
+
+  .home-image {
+    transition: transform 0.4s ease;
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  .fade-in {
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

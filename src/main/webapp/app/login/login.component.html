@@ -1,0 +1,39 @@
+<div class="login-page d-flex align-items-center justify-content-center vh-100">
+  <div class="login-card p-4 shadow-lg rounded-4 bg-white col-lg-5 col-md-7 col-sm-10">
+    <div class="text-center mb-4">
+      <h1 class="fw-bold text-primary" data-cy="loginTitle">Authentification</h1>
+      <p class="text-muted">Connectez-vous pour accéder à votre compte</p>
+    </div>
+
+    <!-- Erreur de connexion -->
+    <div *ngIf="authenticationError()" class="alert alert-danger" data-cy="loginError">
+      <strong>Erreur !</strong> Vérifiez vos identifiants de connexion.
+    </div>
+
+    <form class="form" (ngSubmit)="login()" [formGroup]="loginForm">
+      <div class="mb-3 input-group">
+        <span class="input-group-text bg-primary text-white"><fa-icon icon="user"></fa-icon></span>
+        <input type="text" class="form-control" placeholder="Nom d'utilisateur" formControlName="username" data-cy="username" />
+      </div>
+
+      <div class="mb-3 input-group">
+        <span class="input-group-text bg-primary text-white"><fa-icon icon="lock"></fa-icon></span>
+        <input type="password" class="form-control" placeholder="Mot de passe" formControlName="password" data-cy="password" />
+      </div>
+
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="rememberMe" formControlName="rememberMe" />
+        <label class="form-check-label" for="rememberMe"> Garder la session ouverte </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mb-3" data-cy="submit">Connexion</button>
+    </form>
+
+    <div class="d-flex justify-content-between">
+      <a routerLink="/account/reset/request" class="text-decoration-none small text-primary" data-cy="forgetYourPasswordSelector">
+        Mot de passe oublié ?
+      </a>
+      <a routerLink="/account/register" class="text-decoration-none small text-primary"> Créer un compte </a>
+    </div>
+  </div>
+</div>

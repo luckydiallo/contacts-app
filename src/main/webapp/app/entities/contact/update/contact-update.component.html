@@ -1,0 +1,99 @@
+<div class="d-flex justify-content-center mt-4">
+  <div class="col-md-8 col-lg-6 card shadow-sm p-4 rounded-3">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-contact-heading" data-cy="ContactCreateUpdateHeading" class="text-center mb-4 fw-bold text-primary">
+        {{ editForm.get('id')?.value ? 'Modifier le contact' : 'Créer un contact' }}
+      </h2>
+
+      <jhi-alert-error />
+
+      <!-- ID (lecture seule en mode édition) -->
+      @if (editForm.get('id')?.value !== null) {
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="field_id">Identifiant</label>
+          <input type="number" class="form-control bg-light" id="field_id" formControlName="id" readonly />
+        </div>
+      }
+
+      <!-- Nom -->
+      @let nomRef = editForm.get('nom')!;
+      <div class="mb-3">
+        <label class="form-label fw-semibold" for="field_nom">Nom</label>
+        <input type="text" class="form-control" id="field_nom" formControlName="nom" placeholder="Entrez le nom du contact" />
+        @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
+          <small class="text-danger">Ce champ est obligatoire.</small>
+        }
+      </div>
+
+      <!-- Prénom -->
+      @let prenomRef = editForm.get('prenom')!;
+      <div class="mb-3">
+        <label class="form-label fw-semibold" for="field_prenom">Prénom</label>
+        <input type="text" class="form-control" id="field_prenom" formControlName="prenom" placeholder="Entrez le prénom du contact" />
+        @if (prenomRef.invalid && (prenomRef.dirty || prenomRef.touched)) {
+          <small class="text-danger">Ce champ est obligatoire.</small>
+        }
+      </div>
+
+      <!-- Email -->
+      @let emailRef = editForm.get('email')!;
+      <div class="mb-3">
+        <label class="form-label fw-semibold" for="field_email">Email</label>
+        <input type="email" class="form-control" id="field_email" formControlName="email" placeholder="exemple@email.com" />
+        @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
+          <small class="text-danger">Ce champ est obligatoire.</small>
+        }
+      </div>
+
+      <!-- Rue -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold" for="field_street">Adresse</label>
+        <input type="text" class="form-control" id="field_street" formControlName="street" placeholder="Rue, quartier..." />
+      </div>
+
+      <!-- Téléphone -->
+      @let telephoneRef = editForm.get('telephone')!;
+      <div class="mb-3">
+        <label class="form-label fw-semibold" for="field_telephone">Téléphone</label>
+        <input type="text" class="form-control" id="field_telephone" formControlName="telephone" placeholder="Ex : +226 70 00 00 00" />
+        @if (telephoneRef.invalid && (telephoneRef.dirty || telephoneRef.touched)) {
+          <small class="text-danger">Ce champ est obligatoire.</small>
+        }
+      </div>
+
+      <!-- Groupe -->
+      <div class="mb-4">
+        <label class="form-label fw-semibold" for="field_groupe_id">Groupe</label>
+        <select class="form-select" id="field_groupe_id" formControlName="groupe_id" [compareWith]="compareGroupe">
+          <option [ngValue]="null">-- Sélectionner un groupe --</option>
+          @for (groupeOption of groupesSharedCollection; track $index) {
+            <option [ngValue]="groupeOption">{{ groupeOption.nom }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Boutons -->
+      <div class="d-flex justify-content-between">
+        <button
+          type="button"
+          id="cancel-save"
+          data-cy="entityCreateCancelButton"
+          class="btn btn-outline-secondary px-4"
+          (click)="previousState()"
+        >
+          <fa-icon icon="ban" class="me-1"></fa-icon> Annuler
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary px-4"
+        >
+          <fa-icon icon="save" class="me-1"></fa-icon> Sauvegarder
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
