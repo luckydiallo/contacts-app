@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repository
@@ -32,27 +32,15 @@ jobs:
 
       - name: Push Docker image
         run: docker push belcodiallo/contacts-app:${{ github.run_number }}
-        env:
-          IMAGE_NAME: belcodiallo/contacts-app
-
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v4
-        with:
-          version: 'latest'
-
-      - name: Configure kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
-          kubectl config view --minify
 
       - name: Deploy to Kubernetes
-        run: |
-          kubectl set image deployment/$DEPLOYMENT_NAME \
-            $DEPLOYMENT_NAME=$IMAGE_NAME:${{ github.run_number }} \
-            -n $K8S_NAMESPACE
         env:
           IMAGE_NAME: belcodiallo/contacts-app
           DEPLOYMENT_NAME: contacts-app
           K8S_NAMESPACE: default
+        run: |
+          kubectl set image deployment/$DEPLOYMENT_NAME \
+            $DEPLOYMENT_NAME=$IMAGE_NAME:${{ github.run_number }} \
+            -n $K8S_NAMESPACE
+
+          kubectl rollout status deployment/$DEPLOYMENT_NAME -n $K8S_NAMESPACE
