@@ -9,66 +9,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ----------------------------
-      # 1. Récupération du code
-      # ----------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ----------------------------
-      # 2. JDK + Maven
-      # ----------------------------
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Check Maven version
-        run: mvn -v
-
       - name: Build JAR with Maven
-        run: mvn -B package -Dmaven.test.skip=true --file pom.xml
+        run: mvn -B package --file pom.xml
 
-      # ----------------------------
-      # 3. Login Docker Hub
-      # ----------------------------
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: belcodiallo
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          password: Docker @192.168.0.0
 
-      # ----------------------------
-      # 4. Construction Image Docker
-      # ----------------------------
-      - name: Build Docker image
-        run: |
-          echo "Vérification du Dockerfile"
-          cat Dockerfile
-
-          echo "Nettoyage du cache Docker"
-          docker system prune -af
-
-          echo "Build image Docker"
       - name: Build Docker image
         run: docker build -t belcodiallo/contacts-app:${{ github.run_number }} .
 
-      # ----------------------------
-      # 5. Push Docker Hub
-      # ----------------------------
       - name: Push Docker image
-        run: |
-          docker push belcodiallo/contacts-app:${{ github.run_number }}
-          docker push belcodiallo/contacts-app:latest
+        run: docker push belcodiallo/contacts-app:${{ github.run_number }}
+        env:
+          IMAGE_NAME: belcodiallo/contacts-app
 
-      # ----------------------------
-      # 6. Kubectl
-      # ----------------------------
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4
         with:
-          version: latest
+          version: 'latest'
 
       - name: Configure kubeconfig
         run: |
@@ -77,16 +47,12 @@ jobs:
           chmod 600 $HOME/.kube/config
           kubectl config view --minify
 
-      # ----------------------------
-      # 7. Déploiement Kubernetes
-      # ----------------------------
       - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/$DEPLOYMENT_NAME \
-            $DEPLOYMENT_NAME=belcodiallo/contacts-app:${{ github.run_number }} \
+            $DEPLOYMENT_NAME=$IMAGE_NAME:${{ github.run_number }} \
             -n $K8S_NAMESPACE
-
-          kubectl rollout status deployment/$DEPLOYMENT_NAME -n $K8S_NAMESPACE
         env:
+          IMAGE_NAME: belcodiallo/contacts-app
           DEPLOYMENT_NAME: contacts-app
           K8S_NAMESPACE: default
