@@ -37,16 +37,15 @@ Ce projet est conçu pour être facilement déployé via Docker, Docker Compose,
     ------
     docker push belcodiallo/contacts-app:${{ github.run_number }} -> Push de l’image Docker sur le registry
     ------
-    azure/setup-kubectl@v4 -> Initialisation de kubectl
-    ------
-    mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
-          kubectl config view --minify -> Configuration de kubeconfig
-    ------
     kubectl set image deployment/$DEPLOYMENT_NAME \
             $DEPLOYMENT_NAME=$IMAGE_NAME:${{ github.run_number }} \
-            -n $K8S_NAMESPACE -> Deployer l'image sur kunernetes
+            -n $K8S_NAMESPACE
+          kubectl rollout status deployment/$DEPLOYMENT_NAME -n $K8S_NAMESPACE -> Deploiement sur kubernetes
+    ------
+    kubectl get deployment -A -> Voir tous les deploiements
+
+    ------
+    kubect  get pods -A -> Voir tous les conteneurs
 
 ## Logique du pipeline CI/CD
 
