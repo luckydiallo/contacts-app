@@ -44,17 +44,15 @@ jobs:
       # ----------------------------
       - name: Build Docker image
         run: |
-          echo "✅ Vérification du Dockerfile"
+          echo "Vérification du Dockerfile"
           cat Dockerfile
 
-          echo "✅ Nettoyage du cache Docker"
+          echo "Nettoyage du cache Docker"
           docker system prune -af
 
-          echo "✅ Build image Docker"
-          docker build --pull always \
-            -t belcodiallo/contacts-app:${{ github.run_number }} \
-            -t belcodiallo/contacts-app:latest \
-            .
+          echo "Build image Docker"
+      - name: Build Docker image
+        run: docker build -t belcodiallo/contacts-app:${{ github.run_number }} .
 
       # ----------------------------
       # 5. Push Docker Hub
