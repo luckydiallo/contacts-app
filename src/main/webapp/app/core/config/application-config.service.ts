@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class ApplicationConfigService {
-  private endpointPrefix = '';
+  private endpointPrefix = 'http://10.98.215.120:8080';
   private microfrontend = false;
 
   setEndpointPrefix(endpointPrefix: string): void {
