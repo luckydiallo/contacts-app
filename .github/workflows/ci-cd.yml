@@ -91,13 +91,6 @@ jobs:
     needs: [build-and-push]
     environment: production
     steps:
-      - name: Kubectl context (si nécessaire)
-        if: ${{ secrets.KUBECONFIG_CONTENTS != '' }}
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG_CONTENTS }}" > ~/.kube/config
-          chmod 600 ~/.kube/config
-
       - name: Vérifier le cluster
         run: kubectl get nodes -o wide
 
