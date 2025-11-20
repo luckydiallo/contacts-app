@@ -36,10 +36,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build backend JAR (prod)
-        working-directory: backend
-        run: |
-          ./mvnw -B -DskipTests=true -Pprod clean package
+      - name: Build JAR with Maven
+        run: mvn -B package -Dmaven.test.skip=true --file pom.xml
 
       - name: Set up Node 18 (frontend)
         uses: actions/setup-node@v4
