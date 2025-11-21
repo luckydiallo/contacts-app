@@ -10,42 +10,55 @@ env:
   REGISTRY: docker.io
   IMAGE_BACKEND: belcodiallo/myapp-backend
   IMAGE_FRONTEND: belcodiallo/myapp-frontend
-  # Déploiements & conteneurs K8s!
   K8S_NAMESPACE: default
   DEPLOY_BACKEND: contact-app-backend
   DEPLOY_FRONTEND: contact-app-frontend
   CONTAINER_BACKEND: backend
   CONTAINER_FRONTEND: frontend
-  # Tag lisible + immuable
   IMG_TAG: ${{ github.run_number }}
   IMG_SHA: ${{ github.sha }}
 
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
 jobs:
   build-and-push:
+    name: Build and Push Images
     runs-on: self-hosted
-    permissions:
-      contents: read
-      packages: write
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      - name: Show repo layout (debug)
+        run: |
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          ls -la
+          ls -la src || true
+          ls -la src/main/webapp || true
+
+      # Backend: build jar
       - name: Set up JDK 17 (backend)
         uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '17'
-          distribution: 'temurin'
 
       - name: Build JAR with Maven
-        run: mvn -B package -Dmaven.test.skip=true --file pom.xml
+        run: mvn -B package -DskipTests --file pom.xml
 
-      - name: Set up Node 18 (frontend)
+      # Frontend build
+      - name: Set up Node.js (frontend)
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '18'
+          cache: 'npm'
 
-      - name: Build frontend (prod)
-        working-directory: frontend
+      - name: Build frontend (webapp)
+        working-directory: ./src/main/webapp
         run: |
           npm ci
           npm run build --if-present --prod
@@ -56,12 +69,12 @@ jobs:
           username: ${{ env.REGISTRY_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      # Backend
+      # Build & push backend image
       - name: Build & push backend image
         uses: docker/build-push-action@v6
         with:
-          context: ./backend
-          file: ./backend/Dockerfile
+          context: .
+          file: ./Dockerfile.backend
           push: true
           tags: |
             ${{ env.IMAGE_BACKEND }}:${{ env.IMG_TAG }}
@@ -71,12 +84,12 @@ jobs:
           cache-from: type=registry,ref=${{ env.IMAGE_BACKEND }}:latest
           cache-to: type=inline
 
-      # Frontend
+      # Build & push frontend image
       - name: Build & push frontend image
         uses: docker/build-push-action@v6
         with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
+          context: .
+          file: ./Dockerfile.frontend
           push: true
           tags: |
             ${{ env.IMAGE_FRONTEND }}:${{ env.IMG_TAG }}
@@ -85,36 +98,58 @@ jobs:
           cache-to: type=inline
 
   deploy:
+    name: Deploy to Kubernetes
     runs-on: self-hosted
-    needs: [build-and-push]
+    needs: build-and-push
     environment: production
     steps:
+      - name: Checkout (for kubectl manifests if needed)
+        uses: actions/checkout@v4
+
+      - name: Show kubectl version & current context (debug)
+        run: |
+          kubectl version --client=true || true
+          kubectl config view --minify || true
+        continue-on-error: true
+
       - name: Vérifier le cluster
-        run: kubectl get nodes -o wide
+        run: |
+          echo "nodes:"
+          kubectl get nodes -o wide
+          echo "namespaces:"
+          kubectl get ns
 
       - name: Déployer BACKEND (rolling update)
         env:
           IMG: ${{ env.IMAGE_BACKEND }}:${{ env.IMG_TAG }}
         run: |
-          # Affiche les conteneurs actuels pour t'aider à valider les noms
-          kubectl get deploy $DEPLOY_BACKEND -n $K8S_NAMESPACE -o=jsonpath='{.spec.template.spec.containers[*].name}{"\n"}' || true
+          echo "Current containers in deployment ${DEPLOY_BACKEND}:"
+          kubectl get deploy ${DEPLOY_BACKEND} -n ${K8S_NAMESPACE} -o=jsonpath='{.spec.template.spec.containers[*].name}{"\n"}' || true
 
-          kubectl set image deployment/$DEPLOY_BACKEND \
-            $CONTAINER_BACKEND=$IMG \
-            -n $K8S_NAMESPACE
+          echo "Setting image to $IMG"
+          kubectl set image deployment/${DEPLOY_BACKEND} ${CONTAINER_BACKEND}=$IMG -n ${K8S_NAMESPACE}
 
-          kubectl rollout status deployment/$DEPLOY_BACKEND -n $K8S_NAMESPACE --timeout=180s
-          kubectl rollout history deployment/$DEPLOY_BACKEND -n $K8S_NAMESPACE
+          echo "Waiting rollout status..."
+          kubectl rollout status deployment/${DEPLOY_BACKEND} -n ${K8S_NAMESPACE} --timeout=300s
+          kubectl rollout history deployment/${DEPLOY_BACKEND} -n ${K8S_NAMESPACE}
 
       - name: Déployer FRONTEND (rolling update)
         env:
           IMG: ${{ env.IMAGE_FRONTEND }}:${{ env.IMG_TAG }}
         run: |
-          kubectl get deploy $DEPLOY_FRONTEND -n $K8S_NAMESPACE -o=jsonpath='{.spec.template.spec.containers[*].name}{"\n"}' || true
+          echo "Current containers in deployment ${DEPLOY_FRONTEND}:"
+          kubectl get deploy ${DEPLOY_FRONTEND} -n ${K8S_NAMESPACE} -o=jsonpath='{.spec.template.spec.containers[*].name}{"\n"}' || true
 
-          kubectl set image deployment/$DEPLOY_FRONTEND \
-            $CONTAINER_FRONTEND=$IMG \
-            -n $K8S_NAMESPACE
+          echo "Setting image to $IMG"
+          kubectl set image deployment/${DEPLOY_FRONTEND} ${CONTAINER_FRONTEND}=$IMG -n ${K8S_NAMESPACE}
 
-          kubectl rollout status deployment/$DEPLOY_FRONTEND -n $K8S_NAMESPACE --timeout=180s
-          kubectl rollout history deployment/$DEPLOY_FRONTEND -n $K8S_NAMESPACE
+          echo "Waiting rollout status..."
+          kubectl rollout status deployment/${DEPLOY_FRONTEND} -n ${K8S_NAMESPACE} --timeout=300s
+          kubectl rollout history deployment/${DEPLOY_FRONTEND} -n ${K8S_NAMESPACE}
+
+      - name: Post-deploy checks
+        run: |
+          echo "Pods in namespace $K8S_NAMESPACE:"
+          kubectl get pods -n $K8S_NAMESPACE -o wide
+          echo "Services in namespace $K8S_NAMESPACE:"
+          kubectl get svc -n $K8S_NAMESPACE -o wide
