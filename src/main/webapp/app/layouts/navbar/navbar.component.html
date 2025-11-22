@@ -59,6 +59,13 @@
           </a>
         </li>
 
+        <li class="nav-item" routerLinkActive="active">
+          <a class="nav-link d-flex align-items-center" routerLink="/groupe/new" (click)="collapseNavbar()">
+            <fa-icon icon="plus" class="me-1"></fa-icon>
+            <span>Menu test</span>
+          </a>
+        </li>
+
         <!-- Administration -->
         <li *jhiHasAnyAuthority="'ROLE_ADMIN'" ngbDropdown class="nav-item dropdown" routerLinkActive="active">
           <a
